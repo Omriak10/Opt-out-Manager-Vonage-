@@ -1,0 +1,27 @@
+project:
+    name: sms-optout-manager
+instance:
+    name: production
+    runtime: nodejs22
+    region: aws.euw1
+    application-id: Your App ID here
+    entrypoint: [node, server.js]
+    capabilities:
+        - state
+    environment:
+        - name: VONAGE_API_KEY
+          value: "Your API Key here"
+        - name: VONAGE_API_SECRET
+          value: "Your API Secret here"
+debug:
+    name: debug
+    application-id: Your App ID here
+    entrypoint: [nodemon, --inspect, server.js]
+    capabilities:
+        - state
+    environment:
+        - name: VONAGE_API_KEY
+          value: "Your API Key here"
+        - name: VONAGE_API_SECRET
+          value: "Your API Secret here"
+    preserve-data: true

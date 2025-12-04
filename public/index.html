@@ -1,0 +1,2545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vonage Opt-out System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .vonage-logo {
+            width: 140px;
+            height: auto;
+        }
+
+        .header-divider {
+            width: 2px;
+            height: 40px;
+            background: #444;
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: white;
+        }
+
+        .header .subtitle {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .header-right {
+            margin-left: auto;
+        }
+
+        .help-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .help-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 0 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #000;
+            background: #f8f9fa;
+        }
+
+        .tab.active {
+            color: #000;
+            border-bottom-color: #000;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-card.optout {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .stat-card.optin {
+            border-left: 4px solid #27ae60;
+        }
+
+        .stat-card.sent {
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-period {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #000;
+        }
+
+        .form-group input:disabled, .form-group select:disabled {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #000;
+            color: white;
+        }
+
+        .btn:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            min-width: 36px;
+            justify-content: center;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.optout {
+            background: #fdeaea;
+            color: #e74c3c;
+        }
+
+        .status-badge.optin {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .status-badge.locked {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .status-badge.sent {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge.blocked {
+            background: #fdeaea;
+            color: #e74c3c;
+        }
+
+        .status-badge.failed {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 14px;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+
+        .filter-row .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #27ae60;
+            border: 1px solid #c8e6c9;
+        }
+
+        .alert-error {
+            background: #fdeaea;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+
+        .webhook-info {
+            background: #f8f9fa;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        /* Credentials section */
+        .credentials-section {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .credentials-section .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .credentials-locked {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .credentials-locked .info {
+            flex: 1;
+        }
+
+        .credentials-locked .key-display {
+            font-family: monospace;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .credentials-locked .secret-display {
+            font-family: monospace;
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* Opt-out config cards */
+        .optout-config-card {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .optout-config-card.editing {
+            border-color: #000;
+            background: white;
+        }
+
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .config-header h3 {
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .config-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .config-display-item {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+        }
+
+        .config-display-item label {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .config-display-item .value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .add-config-btn {
+            width: 100%;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            background: transparent;
+            color: #666;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .add-config-btn:hover {
+            border-color: #000;
+            color: #000;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Recipients list */
+        .recipients-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .recipient-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin: 4px;
+        }
+
+        .recipient-chip .remove {
+            cursor: pointer;
+            color: #999;
+            font-weight: bold;
+        }
+
+        .recipient-chip .remove:hover {
+            color: #e74c3c;
+        }
+
+        .recipient-chip.blocked {
+            background: #fdeaea;
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        /* File upload */
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: #000;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload p {
+            color: #666;
+            margin: 0;
+        }
+
+        /* Results table */
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-box .number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .result-box .label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .result-box.sent .number { color: #27ae60; }
+        .result-box.blocked .number { color: #e74c3c; }
+        .result-box.failed .number { color: #f57c00; }
+
+        .char-counter {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .char-counter.warning {
+            color: #f57c00;
+        }
+
+        .char-counter.danger {
+            color: #e74c3c;
+        }
+
+        .optout-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .optout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .optout-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: #666;
+        }
+
+        .refresh-btn:hover {
+            color: #000;
+        }
+
+        .api-docs {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .api-docs .method {
+            color: #569cd6;
+        }
+
+        .api-docs .url {
+            color: #ce9178;
+        }
+
+        .api-docs .key {
+            color: #9cdcfe;
+        }
+
+        .api-docs .string {
+            color: #ce9178;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <span style="font-size: 32px; font-weight: 700; color: white; letter-spacing: -1px;">Vonage</span>
+            <div class="header-divider"></div>
+            <div class="header-title">
+                <h1>Opt-out System</h1>
+                <span class="subtitle">SMS Opt-In/Opt-Out Manager</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="help-btn" onclick="showHelp()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                Help
+            </button>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto;">
+        <div style="background: white; max-width: 800px; margin: 40px auto; border-radius: 12px; max-height: calc(100vh - 80px); overflow-y: auto;">
+            <div style="padding: 20px 25px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; border-radius: 12px 12px 0 0;">
+                <h2 style="margin: 0; color: #000;">How to Use This Dashboard</h2>
+                <button onclick="hideHelp()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #666; line-height: 1;">&times;</button>
+            </div>
+            <div style="padding: 25px;">
+                
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">1</span>
+                        Initial Setup - Configuration Tab
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <p style="margin-bottom: 10px;"><strong>Set up your API credentials:</strong></p>
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>Enter your Vonage API Key and Secret</li>
+                            <li>Click "Save Credentials" to save them</li>
+                            <li>Click "Load Account Numbers" to fetch your Vonage numbers</li>
+                        </ul>
+                        <p style="margin: 15px 0 10px;"><strong>Add Custom Sender IDs (Alphanumeric):</strong></p>
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>Alphanumeric senders like "MyBrand" are not automatically loaded</li>
+                            <li>Enter the Sender ID (3-11 alphanumeric characters) and optional description</li>
+                            <li>Click "Add Sender ID" - it will appear in the From Number dropdown</li>
+                            <li>Opt-outs apply to ALL senders (phone numbers and alphanumeric)</li>
+                        </ul>
+                        <p style="margin: 15px 0 10px;"><strong>Create an Opt-Out Configuration:</strong></p>
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>Click "Add New Configuration"</li>
+                            <li>Select your Vonage number from the dropdown</li>
+                            <li>Set your opt-out phrase (e.g., "STOP") - users text this to unsubscribe</li>
+                            <li>Set your opt-in phrase (e.g., "START") - users text this to resubscribe</li>
+                            <li>Click "Save Configuration"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">2</span>
+                        Set Up Vonage Webhook
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <p style="margin-bottom: 15px;"><strong>Your Webhook URL (copy this):</strong></p>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                            <code id="help-webhook-url" style="flex: 1; background: #fff; padding: 10px 15px; border-radius: 6px; border: 2px solid #000; font-size: 14px; word-break: break-all; user-select: all;"></code>
+                            <button onclick="copyToClipboard(document.getElementById('help-webhook-url').textContent)" style="padding: 10px 15px; background: #000; color: white; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap;">Copy</button>
+                        </div>
+                        <p style="margin-bottom: 10px;"><strong>How to set it up in Vonage:</strong></p>
+                        <ol style="margin-left: 20px; color: #555;">
+                            <li>Go to <strong>Vonage Dashboard</strong> → <strong>API Settings</strong></li>
+                            <li>Under SMS Settings, paste the URL above into <strong>Inbound SMS webhooks</strong></li>
+                            <li>Set the method to <strong>POST</strong></li>
+                            <li>Click <strong>Save changes</strong></li>
+                        </ol>
+                        <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107;">
+                            <strong style="color: #856404;">Important:</strong> <span style="color: #856404;">If your Vonage number is linked to a Vonage Application, you must set the webhook URL in that Application's settings instead of the account-level API Settings.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">3</span>
+                        Dashboard Tab
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li><strong>Stats Cards:</strong> Show opt-ins and opt-outs in the last 24 hours</li>
+                            <li><strong>Recent Activity:</strong> Live feed of all opt-in/opt-out events</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">4</span>
+                        Send SMS Tab
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>Send individual or bulk SMS through the dashboard</li>
+                            <li>Messages to opted-out numbers are <strong>automatically blocked</strong></li>
+                            <li>Add recipients manually or paste a comma-separated list</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">5</span>
+                        Manage Opt-Outs Tab
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>View all currently opted-out numbers</li>
+                            <li>Manually add numbers to the blocklist</li>
+                            <li>Remove numbers from the blocklist (opt them back in)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">6</span>
+                        API Tab
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>Integrate with your own applications using the REST API</li>
+                            <li>Includes Postman setup instructions and cURL examples</li>
+                            <li>All API calls automatically respect the opt-out list</li>
+                            <li>Manage custom sender IDs via <code>/api/senders</code> endpoints</li>
+                            <li>Add/remove opt-outs via <code>/api/optout</code> and <code>/api/optin</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <h3 style="color: #000; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #000; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">7</span>
+                        Live Logs Tab
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #000;">
+                        <ul style="margin-left: 20px; color: #555;">
+                            <li>Real-time view of webhook activity</li>
+                            <li>Debug inbound SMS processing</li>
+                            <li>See exactly what data Vonage sends to your app</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="dashboard">Dashboard</button>
+            <button class="tab" data-tab="send">Send SMS</button>
+            <button class="tab" data-tab="config">Configuration</button>
+            <button class="tab" data-tab="reports">Reports</button>
+            <button class="tab" data-tab="manage">Manage Opt-Outs</button>
+            <button class="tab" data-tab="api">API</button>
+            <button class="tab" data-tab="logs">Live Logs</button>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <!-- Storage Status Banner -->
+            <div id="storage-status" style="background: #f8f9fa; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <span id="storage-icon" style="font-size: 18px;"></span>
+                <span id="storage-message" style="color: #666; font-size: 14px;">Checking storage status...</span>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card optin">
+                    <div class="stat-label">Opt-Ins</div>
+                    <div class="stat-value" id="optin-count">0</div>
+                    <div class="stat-period">Last 24 hours</div>
+                </div>
+                <div class="stat-card optout">
+                    <div class="stat-label">Opt-Outs</div>
+                    <div class="stat-value" id="optout-count">0</div>
+                    <div class="stat-period">Last 24 hours</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-header">
+                    <h2>Recent Activity</h2>
+                    <button class="refresh-btn" onclick="loadRecentActivity()" title="Refresh">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="recent-activity">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Send SMS Tab -->
+        <div id="send" class="tab-content">
+            <div class="card">
+                <h2>Send SMS</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Send SMS through this app to automatically block opted-out numbers. Messages to opted-out recipients will be rejected.
+                </p>
+                
+                <div class="form-group">
+                    <label>From Number</label>
+                    <select id="send-from">
+                        <option value="">Select a number...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="send-message" placeholder="Enter your message..." maxlength="1600"></textarea>
+                    <div class="char-counter" id="char-counter">0 / 160 characters (1 SMS)</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Add Recipient Manually</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="manual-recipient" placeholder="e.g., 447123456789" style="flex: 1;">
+                            <button class="btn btn-secondary" onclick="addManualRecipient()">Add</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload CSV (one number per line)</label>
+                        <div class="file-upload" onclick="document.getElementById('csv-file').click()">
+                            <input type="file" id="csv-file" accept=".csv,.txt" onchange="handleCSVUpload(event)">
+                            <p>Click to upload CSV file</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Recipients (<span id="recipient-count">0</span>)</label>
+                    <div class="recipients-container" id="recipients-container">
+                        <div class="empty-state" style="padding: 20px;">No recipients added yet</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="sendBulkSMS()" id="send-btn" disabled>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22,2 15,22 11,13 2,9"/>
+                        </svg>
+                        Send SMS
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearRecipients()">Clear All</button>
+                </div>
+            </div>
+            
+            <!-- Send Results -->
+            <div class="card" id="send-results" style="display: none;">
+                <h2>Send Results</h2>
+                <div class="results-summary" id="results-summary"></div>
+                <div id="results-details"></div>
+            </div>
+        </div>
+
+        <!-- Configuration Tab -->
+        <div id="config" class="tab-content">
+            <div class="card">
+                <h2>API Credentials</h2>
+                
+                <div id="credentials-locked" class="credentials-locked" style="display: none;">
+                    <div class="info">
+                        <div class="key-display">API Key: <span id="locked-api-key"></span></div>
+                        <div class="secret-display">API Secret: ••••••••</div>
+                    </div>
+                    <span class="status-badge locked">✓ Saved</span>
+                    <button class="btn btn-secondary btn-sm" onclick="unlockCredentials()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 1H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-6"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Edit
+                    </button>
+                </div>
+                
+                <div id="credentials-form">
+                    <div class="credentials-section">
+                        <div class="form-group">
+                            <label>API Key</label>
+                            <input type="text" id="apiKey" placeholder="Enter your Vonage API Key">
+                        </div>
+                        <div class="form-group">
+                            <label>API Secret</label>
+                            <input type="password" id="apiSecret" placeholder="Enter your Vonage API Secret">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveCredentials()">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
+                            Save Credentials
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="loadNumbers()" id="load-numbers-btn" disabled>
+                        Load Account Numbers
+                    </button>
+                    <span id="numbers-count" style="margin-left: 15px; color: #666; font-size: 14px;"></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-header">
+                    <h2>Custom Sender IDs (Alphanumeric)</h2>
+                </div>
+                <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                    Add alphanumeric sender IDs (like "MyBrand", "Alerts") that aren't pulled automatically from your Vonage account.
+                </p>
+                
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Sender ID</label>
+                        <input type="text" id="new-sender-id" placeholder="e.g., MyBrand (3-11 chars)" maxlength="11">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Description (Optional)</label>
+                        <input type="text" id="new-sender-desc" placeholder="e.g., Marketing campaigns">
+                    </div>
+                </div>
+                <button class="btn" onclick="addCustomSender()">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Sender ID
+                </button>
+                
+                <div id="custom-senders-list" style="margin-top: 20px;"></div>
+            </div>
+
+            <div class="card">
+                <div class="section-header">
+                    <h2>Opt-Out Settings</h2>
+                </div>
+                
+                <div id="optout-configs-container"></div>
+                
+                <button class="add-config-btn" onclick="addNewConfig()">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    Add Another Opt-Out Number
+                </button>
+            </div>
+
+            <div class="card">
+                <h2>Webhook Setup</h2>
+                <p style="color: #666; margin-bottom: 15px;">
+                    Configure this webhook URL in your Vonage Dashboard for each opt-out number to receive incoming SMS:
+                </p>
+                <div class="webhook-info" id="webhook-url">
+                    https://your-server.com/webhooks/inbound
+                </div>
+                <p style="color: #999; font-size: 13px; margin-top: 10px;">
+                    Set HTTP Method to POST and format to JSON in your Vonage number settings.
+                </p>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h2>Activity Reports</h2>
+                <div class="filter-row">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Action Type</label>
+                        <select id="actionFilter">
+                            <option value="all">All Actions</option>
+                            <option value="optin">Opt-Ins Only</option>
+                            <option value="optout">Opt-Outs Only</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="loadReport()">Filter</button>
+                    <button class="btn btn-secondary" onclick="exportReport()">Export CSV</button>
+                </div>
+                <div id="report-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Phone Number</th>
+                                <th>Action</th>
+                                <th>Received On</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Opt-Outs Tab -->
+        <div id="manage" class="tab-content">
+            <div class="card">
+                <h2>Manual Opt-Out / Opt-In</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number (with country code)</label>
+                        <input type="text" id="manualNumber" placeholder="e.g., 447123456789">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px;">
+                        <button class="btn btn-danger" onclick="manualOptout()">Opt-Out</button>
+                        <button class="btn btn-success" onclick="manualOptin()">Opt-In</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-header">
+                    <h2>Current Opt-Out List</h2>
+                    <button class="refresh-btn" onclick="loadOptouts()" title="Refresh">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="optout-list" id="optout-list">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Tab -->
+        <div id="api" class="tab-content">
+            <div class="card">
+                <h2>API Documentation</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Use these endpoints to integrate SMS sending into your applications. All SMS sent through these endpoints will automatically check the blocklist.
+                </p>
+                
+                <div style="background: #f0f4f8; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+                    <strong>Your Server URL:</strong>
+                    <code id="server-url" style="background: #fff; padding: 5px 10px; border-radius: 4px; margin-left: 10px; user-select: all;"></code>
+                    <button onclick="copyToClipboard(document.getElementById('server-url').textContent)" style="margin-left: 10px; padding: 5px 10px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: #fff;">Copy</button>
+                </div>
+
+                <h3 style="margin: 25px 0 15px; font-size: 18px; border-bottom: 2px solid #000; padding-bottom: 8px;">Postman Setup Instructions</h3>
+                
+                <div style="background: #fafafa; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                    <p style="margin-bottom: 15px;"><strong>Step 1:</strong> Change method from GET to <strong>POST</strong></p>
+                    <p style="margin-bottom: 15px;"><strong>Step 2:</strong> Paste this URL:</p>
+                    <code id="postman-url" style="display: block; background: #fff; padding: 10px; border-radius: 4px; margin-bottom: 15px; user-select: all; word-break: break-all;"></code>
+                    <p style="margin-bottom: 15px;"><strong>Step 3:</strong> Click <strong>Body</strong> tab → Select <strong>raw</strong> → Change dropdown to <strong>JSON</strong></p>
+                    <p style="margin-bottom: 15px;"><strong>Step 4:</strong> Paste this JSON (replace with your numbers):</p>
+                    <pre style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto;">{
+  <span style="color: #9cdcfe;">"to"</span>: <span style="color: #ce9178;">"RECIPIENT_PHONE_NUMBER"</span>,
+  <span style="color: #9cdcfe;">"from"</span>: <span style="color: #ce9178;">"YOUR_VONAGE_NUMBER"</span>,
+  <span style="color: #9cdcfe;">"text"</span>: <span style="color: #ce9178;">"Hello from Postman!"</span>
+}</pre>
+                    <p style="margin-top: 15px;"><strong>Step 5:</strong> Click <strong>Send</strong></p>
+                </div>
+
+                <h3 style="margin: 25px 0 15px; font-size: 18px; border-bottom: 2px solid #000; padding-bottom: 8px;">API Endpoints</h3>
+                
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Send Single SMS</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-send-url"></span><br><br>
+                    <strong>Headers:</strong><br>
+                    Content-Type: application/json<br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"to"</span>: <span class="string">"447123456789"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"from"</span>: <span class="string">"YOUR_VONAGE_NUMBER"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"text"</span>: <span class="string">"Your message here"</span><br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-send" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+                
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Send Bulk SMS</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-bulk-url"></span><br><br>
+                    <strong>Headers:</strong><br>
+                    Content-Type: application/json<br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"recipients"</span>: [<span class="string">"447123456789"</span>, <span class="string">"447987654321"</span>],<br>
+                    &nbsp;&nbsp;<span class="key">"from"</span>: <span class="string">"YOUR_VONAGE_NUMBER"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"text"</span>: <span class="string">"Your message here"</span><br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-bulk" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+                
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Check If Number Is Blocked</h4>
+                <div class="api-docs">
+                    <span class="method">GET</span> <span class="url" id="api-check-url"></span><br><br>
+                    <strong>Response:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"number"</span>: <span class="string">"447123456789"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"blocked"</span>: true<br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-check" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Webhook URL (for Vonage Dashboard)</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-webhook-url"></span><br><br>
+                    Set this URL in your Vonage Dashboard under SMS Settings → Inbound SMS webhooks
+                </div>
+                
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Response Codes</h4>
+                <table style="margin-top: 10px; width: 100%;">
+                    <tr><td style="width: 80px;"><strong>200</strong></td><td>SMS sent successfully</td></tr>
+                    <tr><td><strong>400</strong></td><td>Missing fields or invalid request</td></tr>
+                    <tr><td><strong>403</strong></td><td>Number is opted out (blocked)</td></tr>
+                    <tr><td><strong>500</strong></td><td>Server error</td></tr>
+                </table>
+
+                <h3 style="margin: 35px 0 15px; font-size: 18px; border-bottom: 2px solid #000; padding-bottom: 8px;">Opt-Out Management API</h3>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Get All Opted-Out Numbers</h4>
+                <div class="api-docs">
+                    <span class="method" style="background: #28a745;">GET</span> <span class="url" id="api-optouts-url"></span><br><br>
+                    <strong>Response:</strong><br>
+                    [<span class="string">"447123456789"</span>, <span class="string">"447987654321"</span>]
+                </div>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Add Single Number to Opt-Out List</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-optout-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"number"</span>: <span class="string">"447123456789"</span><br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-optout" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Bulk Add Numbers to Opt-Out List</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-optout-bulk-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"numbers"</span>: [<span class="string">"447123456789"</span>, <span class="string">"447987654321"</span>, <span class="string">"447555555555"</span>]<br>
+                    }<br><br>
+                    <strong>Response:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"success"</span>: true,<br>
+                    &nbsp;&nbsp;<span class="key">"summary"</span>: { <span class="key">"total"</span>: 3, <span class="key">"added"</span>: 2, <span class="key">"alreadyBlocked"</span>: 1 }<br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-optout-bulk" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Remove Single Number from Opt-Out List (Opt-In)</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-optin-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"number"</span>: <span class="string">"447123456789"</span><br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-optin" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Bulk Remove Numbers from Opt-Out List</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-optin-bulk-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"numbers"</span>: [<span class="string">"447123456789"</span>, <span class="string">"447987654321"</span>]<br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-optin-bulk" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h3 style="margin: 35px 0 15px; font-size: 18px; border-bottom: 2px solid #000; padding-bottom: 8px;">Custom Senders API (Alphanumeric)</h3>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Get All Custom Senders</h4>
+                <div class="api-docs">
+                    <span class="method" style="background: #28a745;">GET</span> <span class="url" id="api-senders-url"></span><br><br>
+                    <strong>Response:</strong><br>
+                    [<br>
+                    &nbsp;&nbsp;{<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"id"</span>: <span class="string">"1234567890"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"senderId"</span>: <span class="string">"MyBrand"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"description"</span>: <span class="string">"Marketing campaigns"</span><br>
+                    &nbsp;&nbsp;}<br>
+                    ]
+                </div>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Add Custom Sender</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-senders-post-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"senderId"</span>: <span class="string">"MyBrand"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"description"</span>: <span class="string">"Marketing campaigns"</span><br>
+                    }<br><br>
+                    <em style="color: #666;">Sender ID must be 3-11 alphanumeric characters</em>
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-sender-add" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Bulk Add Custom Senders</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-senders-bulk-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"senders"</span>: [<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="key">"senderId"</span>: <span class="string">"Brand1"</span>, <span class="key">"description"</span>: <span class="string">"Main brand"</span> },<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="key">"senderId"</span>: <span class="string">"Alerts"</span>, <span class="key">"description"</span>: <span class="string">"System alerts"</span> }<br>
+                    &nbsp;&nbsp;]<br>
+                    }
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-sender-bulk" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Delete Custom Sender</h4>
+                <div class="api-docs">
+                    <span class="method" style="background: #dc3545;">DELETE</span> <span class="url">/api/senders/{id}</span>
+                </div>
+
+                <h3 style="margin: 35px 0 15px; font-size: 18px; border-bottom: 2px solid #000; padding-bottom: 8px;">Configuration Management API</h3>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Get All Configurations</h4>
+                <div class="api-docs">
+                    <span class="method" style="background: #28a745;">GET</span> <span class="url" id="api-configs-url"></span><br><br>
+                    <strong>Response:</strong><br>
+                    [<br>
+                    &nbsp;&nbsp;{<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"id"</span>: <span class="string">"1234567890"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"optoutNumber"</span>: <span class="string">"447418317717"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"optoutPhrase"</span>: <span class="string">"STOP"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"optinPhrase"</span>: <span class="string">"START"</span><br>
+                    &nbsp;&nbsp;}<br>
+                    ]
+                </div>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Add New Configuration</h4>
+                <div class="api-docs">
+                    <span class="method">POST</span> <span class="url" id="api-configs-post-url"></span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"optoutNumber"</span>: <span class="string">"447418317717"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"optoutPhrase"</span>: <span class="string">"STOP,UNSUBSCRIBE,QUIT"</span>,<br>
+                    &nbsp;&nbsp;<span class="key">"optinPhrase"</span>: <span class="string">"START,SUBSCRIBE"</span><br>
+                    }<br><br>
+                    <em style="color: #666;">Note: Multiple phrases can be comma-separated</em>
+                </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #000; font-weight: 500;">Show cURL Example</summary>
+                    <pre id="curl-config-add" style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 4px; overflow-x: auto; margin-top: 10px; font-size: 13px;"></pre>
+                </details>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Update Configuration</h4>
+                <div class="api-docs">
+                    <span class="method" style="background: #ffc107; color: #000;">PUT</span> <span class="url">/api/configs/{id}</span><br><br>
+                    <strong>Body:</strong><br>
+                    {<br>
+                    &nbsp;&nbsp;<span class="key">"optoutPhrase"</span>: <span class="string">"STOP,END,CANCEL"</span><br>
+                    }<br><br>
+                    <em style="color: #666;">Only include fields you want to update</em>
+                </div>
+
+                <h4 style="margin: 20px 0 10px; font-size: 16px;">Delete Configuration</h4>
+                <div class="api-docs">
+                    <span class="method" style="background: #dc3545;">DELETE</span> <span class="url">/api/configs/{id}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Tab -->
+        <div id="logs" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Live Logs</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 5px;">
+                            <input type="checkbox" id="auto-scroll" checked>
+                            Auto-scroll
+                        </label>
+                        <button class="btn btn-secondary" onclick="clearLogs()">Clear</button>
+                        <button class="btn" onclick="refreshLogs()">Refresh</button>
+                    </div>
+                </div>
+                <div id="logs-container" style="background: #1e1e1e; color: #00ff00; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; padding: 15px; border-radius: 8px; height: 500px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word;">
+                    <div id="logs-content">Connecting to logs...</div>
+                </div>
+                <p style="color: #666; margin-top: 10px; font-size: 13px;">
+                    Logs refresh automatically every 2 seconds. Webhook URL: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px;">/webhooks/inbound-sms</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let accountNumbers = [];
+        let optoutConfigs = [];
+        let editingConfigId = null;
+        let recipients = [];
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        // ========== SMS SENDING ==========
+        
+        // Character counter
+        document.getElementById('send-message').addEventListener('input', function() {
+            const length = this.value.length;
+            const smsCount = Math.ceil(length / 160) || 1;
+            const counter = document.getElementById('char-counter');
+            counter.textContent = `${length} / 160 characters (${smsCount} SMS${smsCount > 1 ? 's' : ''})`;
+            
+            counter.className = 'char-counter';
+            if (length > 160) counter.classList.add('warning');
+            if (length > 320) counter.classList.add('danger');
+            
+            updateSendButton();
+        });
+
+        function updateSendButton() {
+            const from = document.getElementById('send-from').value;
+            const message = document.getElementById('send-message').value.trim();
+            const btn = document.getElementById('send-btn');
+            btn.disabled = !from || !message || recipients.length === 0;
+        }
+
+        function addManualRecipient() {
+            const input = document.getElementById('manual-recipient');
+            const number = input.value.trim().replace(/[^0-9]/g, '');
+            
+            if (!number) {
+                showAlert('Please enter a valid phone number', 'error');
+                return;
+            }
+            
+            if (!recipients.includes(number)) {
+                recipients.push(number);
+                renderRecipients();
+            }
+            
+            input.value = '';
+            updateSendButton();
+        }
+
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split(/[\r\n,]+/);
+                let added = 0;
+                
+                lines.forEach(line => {
+                    const number = line.trim().replace(/[^0-9]/g, '');
+                    if (number && number.length >= 10 && !recipients.includes(number)) {
+                        recipients.push(number);
+                        added++;
+                    }
+                });
+                
+                renderRecipients();
+                showAlert(`Added ${added} numbers from CSV`, 'success');
+                updateSendButton();
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function removeRecipient(number) {
+            recipients = recipients.filter(r => r !== number);
+            renderRecipients();
+            updateSendButton();
+        }
+
+        function clearRecipients() {
+            recipients = [];
+            renderRecipients();
+            updateSendButton();
+        }
+
+        function renderRecipients() {
+            const container = document.getElementById('recipients-container');
+            document.getElementById('recipient-count').textContent = recipients.length;
+            
+            if (recipients.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="padding: 20px;">No recipients added yet</div>';
+                return;
+            }
+            
+            container.innerHTML = recipients.map(number => `
+                <span class="recipient-chip">
+                    ${number}
+                    <span class="remove" onclick="removeRecipient('${number}')">×</span>
+                </span>
+            `).join('');
+        }
+
+        async function sendBulkSMS() {
+            const from = document.getElementById('send-from').value;
+            const text = document.getElementById('send-message').value.trim();
+            
+            if (!from || !text || recipients.length === 0) {
+                showAlert('Please fill in all fields and add recipients', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>Sending...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/send/bulk`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recipients, from, text })
+                });
+                
+                const data = await response.json();
+                displaySendResults(data);
+                
+                if (data.summary.sent > 0) {
+                    showAlert(`Sent ${data.summary.sent} messages successfully`, 'success');
+                }
+                if (data.summary.blocked > 0) {
+                    showAlert(`${data.summary.blocked} messages blocked (opted-out)`, 'info');
+                }
+                if (data.summary.failed > 0) {
+                    showAlert(`${data.summary.failed} messages failed`, 'error');
+                }
+            } catch (error) {
+                showAlert('Error sending messages: ' + error.message, 'error');
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22,2 15,22 11,13 2,9"/>
+                </svg>
+                Send SMS
+            `;
+            updateSendButton();
+        }
+
+        function displaySendResults(data) {
+            const resultsDiv = document.getElementById('send-results');
+            resultsDiv.style.display = 'block';
+            
+            document.getElementById('results-summary').innerHTML = `
+                <div class="result-box">
+                    <div class="number">${data.summary.total}</div>
+                    <div class="label">Total</div>
+                </div>
+                <div class="result-box sent">
+                    <div class="number">${data.summary.sent}</div>
+                    <div class="label">Sent</div>
+                </div>
+                <div class="result-box blocked">
+                    <div class="number">${data.summary.blocked}</div>
+                    <div class="label">Blocked</div>
+                </div>
+                <div class="result-box failed">
+                    <div class="number">${data.summary.failed}</div>
+                    <div class="label">Failed</div>
+                </div>
+            `;
+            
+            let detailsHtml = '<table><thead><tr><th>Number</th><th>Status</th><th>Details</th></tr></thead><tbody>';
+            
+            data.results.sent.forEach(r => {
+                detailsHtml += `<tr>
+                    <td>${r.to}</td>
+                    <td><span class="status-badge sent">SENT</span></td>
+                    <td>${r.messageId || ''}</td>
+                </tr>`;
+            });
+            
+            data.results.blocked.forEach(r => {
+                detailsHtml += `<tr>
+                    <td>${r.to}</td>
+                    <td><span class="status-badge blocked">BLOCKED</span></td>
+                    <td>Opted-out</td>
+                </tr>`;
+            });
+            
+            data.results.failed.forEach(r => {
+                detailsHtml += `<tr>
+                    <td>${r.to}</td>
+                    <td><span class="status-badge failed">FAILED</span></td>
+                    <td>${r.error || ''}</td>
+                </tr>`;
+            });
+            
+            detailsHtml += '</tbody></table>';
+            document.getElementById('results-details').innerHTML = detailsHtml;
+        }
+
+        // ========== CREDENTIALS MANAGEMENT ==========
+        
+        async function loadCredentials() {
+            try {
+                const response = await fetch(`${API_BASE}/api/credentials`);
+                const credentials = await response.json();
+                
+                if (credentials.isLocked && credentials.apiKey) {
+                    showLockedCredentials(credentials.apiKey);
+                } else {
+                    showCredentialsForm(credentials.apiKey || '', credentials.apiSecret || '');
+                }
+            } catch (error) {
+                console.error('Error loading credentials:', error);
+                showCredentialsForm('', '');
+            }
+        }
+
+        function showLockedCredentials(apiKey) {
+            document.getElementById('credentials-locked').style.display = 'flex';
+            document.getElementById('credentials-form').style.display = 'none';
+            document.getElementById('locked-api-key').textContent = apiKey;
+            document.getElementById('load-numbers-btn').disabled = false;
+        }
+
+        function showCredentialsForm(apiKey, apiSecret) {
+            document.getElementById('credentials-locked').style.display = 'none';
+            document.getElementById('credentials-form').style.display = 'block';
+            document.getElementById('apiKey').value = apiKey;
+            document.getElementById('apiSecret').value = apiSecret;
+            document.getElementById('load-numbers-btn').disabled = true;
+        }
+
+        async function saveCredentials() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const apiSecret = document.getElementById('apiSecret').value.trim();
+            
+            if (!apiKey || !apiSecret) {
+                showAlert('Please enter both API Key and API Secret', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/credentials`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiKey, apiSecret })
+                });
+                
+                if (response.ok) {
+                    showAlert('Credentials saved successfully!', 'success');
+                    showLockedCredentials(apiKey);
+                }
+            } catch (error) {
+                showAlert('Error saving credentials: ' + error.message, 'error');
+            }
+        }
+
+        async function unlockCredentials() {
+            try {
+                const response = await fetch(`${API_BASE}/api/credentials/unlock`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showCredentialsForm(data.apiKey, data.apiSecret);
+                }
+            } catch (error) {
+                showAlert('Error unlocking credentials: ' + error.message, 'error');
+            }
+        }
+
+        // ========== NUMBERS MANAGEMENT ==========
+
+        async function loadNumbers() {
+            try {
+                const response = await fetch(`${API_BASE}/api/numbers`);
+                const numbers = await response.json();
+                
+                if (numbers.error) {
+                    showAlert(numbers.error, 'error');
+                    return;
+                }
+                
+                accountNumbers = numbers;
+                const phoneNumbers = numbers.filter(n => !n.isCustom).length;
+                const customSenders = numbers.filter(n => n.isCustom).length;
+                document.getElementById('numbers-count').textContent = `${phoneNumbers} numbers + ${customSenders} custom senders loaded`;
+                showAlert(`Loaded ${phoneNumbers} numbers and ${customSenders} custom senders`, 'success');
+                
+                // Update send dropdown
+                const sendFrom = document.getElementById('send-from');
+                sendFrom.innerHTML = '<option value="">Select a number...</option>';
+                numbers.forEach(num => {
+                    const option = document.createElement('option');
+                    option.value = num.msisdn;
+                    if (num.isCustom) {
+                        option.textContent = `${num.msisdn} (ALPHA)`;
+                    } else {
+                        option.textContent = `${num.msisdn} (${num.country})`;
+                    }
+                    sendFrom.appendChild(option);
+                });
+                
+                // Re-render configs to update dropdowns
+                renderOptoutConfigs();
+            } catch (error) {
+                showAlert('Error loading numbers: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('send-from').addEventListener('change', updateSendButton);
+
+        // ========== CUSTOM SENDERS MANAGEMENT ==========
+
+        async function loadCustomSenders() {
+            try {
+                const response = await fetch(`${API_BASE}/api/senders`);
+                const senders = await response.json();
+                renderCustomSenders(senders);
+            } catch (error) {
+                console.error('Error loading custom senders:', error);
+            }
+        }
+
+        function renderCustomSenders(senders) {
+            const container = document.getElementById('custom-senders-list');
+            
+            if (!senders || senders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No custom sender IDs added yet.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa; text-align: left;">
+                            <th style="padding: 12px; border-bottom: 2px solid #e0e0e0;">Sender ID</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #e0e0e0;">Description</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #e0e0e0; width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${senders.map(s => `
+                            <tr>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                                    <strong>${s.senderId}</strong>
+                                    <span style="background: #e0e0e0; color: #333; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">ALPHA</span>
+                                </td>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee; color: #666;">${s.description || '-'}</td>
+                                <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                                    <button class="btn btn-danger btn-sm" onclick="deleteCustomSender('${s.id}', '${s.senderId}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function addCustomSender() {
+            const senderId = document.getElementById('new-sender-id').value.trim();
+            const description = document.getElementById('new-sender-desc').value.trim();
+            
+            if (!senderId) {
+                showAlert('Please enter a Sender ID', 'error');
+                return;
+            }
+            
+            if (!/^[a-zA-Z0-9]{3,11}$/.test(senderId)) {
+                showAlert('Sender ID must be 3-11 alphanumeric characters only', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/senders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ senderId, description })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(`Sender ID "${senderId}" added successfully!`, 'success');
+                    document.getElementById('new-sender-id').value = '';
+                    document.getElementById('new-sender-desc').value = '';
+                    loadCustomSenders();
+                    loadNumbers(); // Refresh numbers dropdown to include new sender
+                } else {
+                    showAlert(data.error || 'Failed to add sender', 'error');
+                }
+            } catch (error) {
+                showAlert('Error adding sender: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCustomSender(id, senderId) {
+            if (!confirm(`Are you sure you want to delete "${senderId}"?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/senders/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert(`Sender ID "${senderId}" deleted`, 'success');
+                    loadCustomSenders();
+                    loadNumbers(); // Refresh numbers dropdown
+                } else {
+                    showAlert('Failed to delete sender', 'error');
+                }
+            } catch (error) {
+                showAlert('Error deleting sender: ' + error.message, 'error');
+            }
+        }
+
+        // ========== OPT-OUT CONFIGS MANAGEMENT ==========
+
+        async function loadOptoutConfigs() {
+            try {
+                const response = await fetch(`${API_BASE}/api/config`);
+                const config = await response.json();
+                optoutConfigs = config.optoutConfigs || [];
+                renderOptoutConfigs();
+            } catch (error) {
+                console.error('Error loading configs:', error);
+            }
+        }
+
+        function renderOptoutConfigs() {
+            const container = document.getElementById('optout-configs-container');
+            
+            if (optoutConfigs.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No opt-out numbers configured yet. Add one below.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = optoutConfigs.map((config, index) => {
+                const isEditing = editingConfigId === config.id;
+                const numberDisplay = config.optoutNumber || 'Not selected';
+                
+                if (isEditing) {
+                    return `
+                        <div class="optout-config-card editing">
+                            <div class="config-header">
+                                <h3>Opt-Out Number ${index + 1}</h3>
+                                <div class="config-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="saveConfig('${config.id}')">Save</button>
+                                    <button class="btn btn-secondary btn-sm" onclick="cancelEditConfig()">Cancel</button>
+                                </div>
+                            </div>
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label>Opt-Out Number</label>
+                                    <select id="config-number-${config.id}">
+                                        <option value="">Select a number...</option>
+                                        ${accountNumbers.map(num => `
+                                            <option value="${num.msisdn}" ${config.optoutNumber === num.msisdn ? 'selected' : ''}>
+                                                ${num.msisdn} (${num.country})
+                                            </option>
+                                        `).join('')}
+                                        ${config.optoutNumber && !accountNumbers.find(n => n.msisdn === config.optoutNumber) ? `
+                                            <option value="${config.optoutNumber}" selected>${config.optoutNumber}</option>
+                                        ` : ''}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Opt-Out Phrase</label>
+                                    <input type="text" id="config-optout-${config.id}" value="${config.optoutPhrase || 'STOP'}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Opt-In Phrase</label>
+                                    <input type="text" id="config-optin-${config.id}" value="${config.optinPhrase || 'START'}">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="optout-config-card">
+                            <div class="config-header">
+                                <h3>Opt-Out Number ${index + 1}</h3>
+                                <div class="config-actions">
+                                    <button class="btn btn-secondary btn-sm btn-icon" onclick="editConfig('${config.id}')" title="Edit">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 1H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-6"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm btn-icon" onclick="deleteConfig('${config.id}')" title="Remove">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3,6 5,6 21,6"/>
+                                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="config-display">
+                                <div class="config-display-item">
+                                    <label>Opt-Out Number</label>
+                                    <div class="value">${numberDisplay}</div>
+                                </div>
+                                <div class="config-display-item">
+                                    <label>Opt-Out Phrase</label>
+                                    <div class="value">${config.optoutPhrase || 'STOP'}</div>
+                                </div>
+                                <div class="config-display-item">
+                                    <label>Opt-In Phrase</label>
+                                    <div class="value">${config.optinPhrase || 'START'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        async function addNewConfig() {
+            try {
+                const response = await fetch(`${API_BASE}/api/config/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ optoutNumber: '', optoutPhrase: 'STOP', optinPhrase: 'START' })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    optoutConfigs.push(data.config);
+                    editingConfigId = data.config.id;
+                    renderOptoutConfigs();
+                }
+            } catch (error) {
+                showAlert('Error adding config: ' + error.message, 'error');
+            }
+        }
+
+        function editConfig(configId) {
+            editingConfigId = configId;
+            renderOptoutConfigs();
+        }
+
+        function cancelEditConfig() {
+            editingConfigId = null;
+            loadOptoutConfigs();
+        }
+
+        async function saveConfig(configId) {
+            const number = document.getElementById(`config-number-${configId}`).value;
+            const optoutPhrase = document.getElementById(`config-optout-${configId}`).value.trim();
+            const optinPhrase = document.getElementById(`config-optin-${configId}`).value.trim();
+            
+            if (!optoutPhrase || !optinPhrase) {
+                showAlert('Please enter both opt-out and opt-in phrases', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/config/${configId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ optoutNumber: number, optoutPhrase, optinPhrase })
+                });
+                
+                if (response.ok) {
+                    showAlert('Configuration saved!', 'success');
+                    editingConfigId = null;
+                    loadOptoutConfigs();
+                }
+            } catch (error) {
+                showAlert('Error saving config: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteConfig(configId) {
+            if (!confirm('Are you sure you want to remove this opt-out configuration?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/config/${configId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showAlert('Configuration removed', 'success');
+                    loadOptoutConfigs();
+                }
+            } catch (error) {
+                showAlert('Error removing config: ' + error.message, 'error');
+            }
+        }
+
+        // ========== STATS & ACTIVITY ==========
+
+        async function loadStorageStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/api/storage-status`);
+                const status = await response.json();
+                
+                const iconEl = document.getElementById('storage-icon');
+                const messageEl = document.getElementById('storage-message');
+                const bannerEl = document.getElementById('storage-status');
+                
+                if (status.persistent) {
+                    iconEl.textContent = '✓';
+                    iconEl.style.color = '#28a745';
+                    messageEl.innerHTML = `<strong style="color: #28a745;">Persistent Storage Active</strong> - ${status.data.optedOutNumbers} opted-out numbers, ${status.data.configurations} configs saved`;
+                    bannerEl.style.borderLeft = '4px solid #28a745';
+                } else {
+                    iconEl.textContent = '⚠';
+                    iconEl.style.color = '#ffc107';
+                    messageEl.innerHTML = `<strong style="color: #856404;">Local Storage</strong> - Data may be lost on restart. Deploy to VCR for persistence.`;
+                    bannerEl.style.borderLeft = '4px solid #ffc107';
+                    bannerEl.style.background = '#fff3cd';
+                }
+            } catch (error) {
+                console.error('Error loading storage status:', error);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats`);
+                const stats = await response.json();
+                document.getElementById('optin-count').textContent = stats.optins;
+                document.getElementById('optout-count').textContent = stats.optouts;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                const response = await fetch(`${API_BASE}/api/history`);
+                const history = await response.json();
+                const container = document.getElementById('recent-activity');
+                
+                if (history.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No activity yet. Waiting for incoming messages...</p></div>';
+                    return;
+                }
+                
+                const recent = history.slice(0, 10);
+                container.innerHTML = `
+                    <table>
+                        <thead><tr><th>Time</th><th>Number</th><th>Action</th></tr></thead>
+                        <tbody>
+                            ${recent.map(item => `
+                                <tr>
+                                    <td>${new Date(item.timestamp).toLocaleString()}</td>
+                                    <td>${item.number}</td>
+                                    <td><span class="status-badge ${item.action}">${item.action.toUpperCase()}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading activity:', error);
+            }
+        }
+
+        // ========== REPORTS ==========
+
+        async function loadReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const action = document.getElementById('actionFilter').value;
+            
+            let url = `${API_BASE}/api/history?`;
+            if (startDate) url += `startDate=${startDate}&`;
+            if (endDate) url += `endDate=${endDate}&`;
+            if (action) url += `action=${action}`;
+            
+            try {
+                const response = await fetch(url);
+                const history = await response.json();
+                const tbody = document.getElementById('report-body');
+                
+                if (history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No records found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = history.map(item => `
+                    <tr>
+                        <td>${new Date(item.timestamp).toLocaleString()}</td>
+                        <td>${item.number}</td>
+                        <td><span class="status-badge ${item.action}">${item.action.toUpperCase()}</span></td>
+                        <td>${item.receivedOn}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('Error loading report: ' + error.message, 'error');
+            }
+        }
+
+        async function exportReport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const action = document.getElementById('actionFilter').value;
+            
+            let url = `${API_BASE}/api/history?`;
+            if (startDate) url += `startDate=${startDate}&`;
+            if (endDate) url += `endDate=${endDate}&`;
+            if (action) url += `action=${action}`;
+            
+            try {
+                const response = await fetch(url);
+                const history = await response.json();
+                
+                if (history.length === 0) {
+                    showAlert('No data to export', 'info');
+                    return;
+                }
+                
+                const csv = [
+                    ['Date', 'Time', 'Phone Number', 'Action', 'Received On'].join(','),
+                    ...history.map(item => {
+                        const date = new Date(item.timestamp);
+                        return [date.toLocaleDateString(), date.toLocaleTimeString(), item.number, item.action, item.receivedOn].join(',');
+                    })
+                ].join('\n');
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url2 = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url2;
+                a.download = `optout-report-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url2);
+            } catch (error) {
+                showAlert('Error exporting report: ' + error.message, 'error');
+            }
+        }
+
+        // ========== MANUAL OPT-OUTS ==========
+
+        async function loadOptouts() {
+            try {
+                const response = await fetch(`${API_BASE}/api/optouts`);
+                const optouts = await response.json();
+                const container = document.getElementById('optout-list');
+                
+                if (optouts.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No opted-out numbers</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = optouts.map(number => `
+                    <div class="optout-item">
+                        <span>${number}</span>
+                        <button class="btn btn-success btn-sm" onclick="optinNumber('${number}')">Opt-In</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading optouts:', error);
+            }
+        }
+
+        async function manualOptout() {
+            const number = document.getElementById('manualNumber').value.trim();
+            if (!number) {
+                showAlert('Please enter a phone number', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/optout`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number })
+                });
+                
+                if (response.ok) {
+                    showAlert(`${number} has been opted out`, 'success');
+                    document.getElementById('manualNumber').value = '';
+                    loadOptouts();
+                    loadStats();
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function manualOptin() {
+            const number = document.getElementById('manualNumber').value.trim();
+            if (!number) {
+                showAlert('Please enter a phone number', 'error');
+                return;
+            }
+            await optinNumber(number);
+            document.getElementById('manualNumber').value = '';
+        }
+
+        async function optinNumber(number) {
+            try {
+                const response = await fetch(`${API_BASE}/api/optin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number })
+                });
+                
+                if (response.ok) {
+                    showAlert(`${number} has been opted in`, 'success');
+                    loadOptouts();
+                    loadStats();
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // ========== LIVE LOGS ==========
+        
+        let logsInterval = null;
+        
+        async function refreshLogs() {
+            try {
+                const response = await fetch(`${API_BASE}/api/logs`);
+                const logs = await response.json();
+                const container = document.getElementById('logs-content');
+                
+                if (logs.length === 0) {
+                    container.textContent = 'No logs yet. Send an SMS to your Vonage number to see webhook activity.';
+                } else {
+                    container.innerHTML = logs.map(log => {
+                        const time = new Date(log.timestamp).toLocaleTimeString();
+                        const color = log.level === 'error' ? '#ff6b6b' : 
+                                     log.level === 'warn' ? '#ffd93d' : '#00ff00';
+                        return `<span style="color: #888;">[${time}]</span> <span style="color: ${color};">${escapeHtml(log.message)}</span>`;
+                    }).join('\n');
+                }
+                
+                if (document.getElementById('auto-scroll').checked) {
+                    const logsContainer = document.getElementById('logs-container');
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+            } catch (error) {
+                document.getElementById('logs-content').textContent = 'Error fetching logs: ' + error.message;
+            }
+        }
+        
+        async function clearLogs() {
+            try {
+                await fetch(`${API_BASE}/api/logs`, { method: 'DELETE' });
+                document.getElementById('logs-content').textContent = 'Logs cleared.';
+            } catch (error) {
+                showAlert('Error clearing logs: ' + error.message, 'error');
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function startLogsPolling() {
+            if (!logsInterval) {
+                refreshLogs();
+                logsInterval = setInterval(refreshLogs, 2000);
+            }
+        }
+        
+        function stopLogsPolling() {
+            if (logsInterval) {
+                clearInterval(logsInterval);
+                logsInterval = null;
+            }
+        }
+
+        // ========== HELP MODAL ==========
+        
+        function showHelp() {
+            document.getElementById('help-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideHelp() {
+            document.getElementById('help-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('help-modal')?.addEventListener('click', function(e) {
+            if (e.target === this) hideHelp();
+        });
+
+        // ========== INITIALIZATION ==========
+
+        function setDefaultDates() {
+            const today = new Date();
+            const weekAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('Copied to clipboard!', 'success');
+            }).catch(() => {
+                showAlert('Failed to copy', 'error');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCredentials();
+            loadOptoutConfigs();
+            loadCustomSenders();
+            loadStorageStatus();
+            loadStats();
+            loadRecentActivity();
+            loadOptouts();
+            setDefaultDates();
+            loadReport();
+            
+            const host = window.location.origin || 'https://your-server.com';
+            document.getElementById('webhook-url').textContent = `${host}/webhooks/inbound-sms`;
+            
+            // Populate API documentation URLs - SMS
+            document.getElementById('server-url').textContent = host;
+            document.getElementById('postman-url').textContent = `${host}/api/send`;
+            document.getElementById('api-send-url').textContent = `${host}/api/send`;
+            document.getElementById('api-bulk-url').textContent = `${host}/api/send/bulk`;
+            document.getElementById('api-check-url').textContent = `${host}/api/check/{number}`;
+            document.getElementById('api-webhook-url').textContent = `${host}/webhooks/inbound-sms`;
+            
+            // Populate Help modal webhook URL
+            document.getElementById('help-webhook-url').textContent = `${host}/webhooks/inbound-sms`;
+            
+            // Populate API documentation URLs - Opt-Out Management
+            document.getElementById('api-optouts-url').textContent = `${host}/api/optouts`;
+            document.getElementById('api-optout-url').textContent = `${host}/api/optout`;
+            document.getElementById('api-optout-bulk-url').textContent = `${host}/api/optout/bulk`;
+            document.getElementById('api-optin-url').textContent = `${host}/api/optin`;
+            document.getElementById('api-optin-bulk-url').textContent = `${host}/api/optin/bulk`;
+            
+            // Populate API documentation URLs - Custom Senders
+            document.getElementById('api-senders-url').textContent = `${host}/api/senders`;
+            document.getElementById('api-senders-post-url').textContent = `${host}/api/senders`;
+            document.getElementById('api-senders-bulk-url').textContent = `${host}/api/senders/bulk`;
+            
+            // Populate API documentation URLs - Configuration
+            document.getElementById('api-configs-url').textContent = `${host}/api/configs`;
+            document.getElementById('api-configs-post-url').textContent = `${host}/api/configs`;
+            
+            // Populate cURL examples - SMS
+            document.getElementById('curl-send').textContent = `curl -X POST ${host}/api/send \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "to": "447123456789",
+    "from": "YOUR_VONAGE_NUMBER",
+    "text": "Hello from cURL!"
+  }'`;
+            
+            document.getElementById('curl-bulk').textContent = `curl -X POST ${host}/api/send/bulk \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "recipients": ["447123456789", "447987654321"],
+    "from": "YOUR_VONAGE_NUMBER",
+    "text": "Hello everyone!"
+  }'`;
+            
+            document.getElementById('curl-check').textContent = `curl ${host}/api/check/447123456789`;
+            
+            // Populate cURL examples - Opt-Out Management
+            document.getElementById('curl-optout').textContent = `curl -X POST ${host}/api/optout \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "number": "447123456789"
+  }'`;
+            
+            document.getElementById('curl-optout-bulk').textContent = `curl -X POST ${host}/api/optout/bulk \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "numbers": ["447123456789", "447987654321", "447555555555"]
+  }'`;
+            
+            document.getElementById('curl-optin').textContent = `curl -X POST ${host}/api/optin \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "number": "447123456789"
+  }'`;
+            
+            document.getElementById('curl-optin-bulk').textContent = `curl -X POST ${host}/api/optin/bulk \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "numbers": ["447123456789", "447987654321"]
+  }'`;
+            
+            // Populate cURL examples - Configuration
+            document.getElementById('curl-config-add').textContent = `curl -X POST ${host}/api/configs \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "optoutNumber": "447418317717",
+    "optoutPhrase": "STOP,UNSUBSCRIBE",
+    "optinPhrase": "START,SUBSCRIBE"
+  }'`;
+            
+            // Populate cURL examples - Custom Senders
+            document.getElementById('curl-sender-add').textContent = `curl -X POST ${host}/api/senders \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "senderId": "MyBrand",
+    "description": "Marketing campaigns"
+  }'`;
+            
+            document.getElementById('curl-sender-bulk').textContent = `curl -X POST ${host}/api/senders/bulk \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "senders": [
+      { "senderId": "Brand1", "description": "Main brand" },
+      { "senderId": "Alerts", "description": "System alerts" }
+    ]
+  }'`;
+            
+            setInterval(() => {
+                loadStats();
+                loadRecentActivity();
+            }, 30000);
+            
+            // Start/stop logs polling based on active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    if (tab.dataset.tab === 'logs') {
+                        startLogsPolling();
+                    } else {
+                        stopLogsPolling();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
